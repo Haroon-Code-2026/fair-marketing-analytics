@@ -1,0 +1,10 @@
+attribute,group,n,base_rate,selection_rate,true_positive_rate,false_positive_rate,precision
+age_band,60 and over,283,0.4346,0.8092,0.9024,0.7375,0.4847
+age_band,Under 25,272,0.2279,0.4081,0.8065,0.2905,0.4505
+age_band,25-59,9739,0.1001,0.1657,0.5764,0.12,0.3482
+education,university.degree,3076,0.1398,0.2464,0.7047,0.172,0.3997
+education,professional.course,1313,0.1257,0.1942,0.5939,0.1368,0.3843
+education,high.school,2352,0.1025,0.1807,0.6058,0.1322,0.3435
+education,basic.4y,1045,0.0967,0.1713,0.6832,0.1165,0.3855
+education,basic.9y,1507,0.0829,0.1168,0.368,0.0941,0.2614
+education,basic.6y,570,0.0754,0.114,0.5349,0.0797,0.3538
