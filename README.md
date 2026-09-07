@@ -5,13 +5,14 @@
 Analysing fairness, vulnerability and governance in automated financial product targeting.
 
 **Live dashboard:**
-
+[tableau dashboard](https://public.tableau.com/views/FairMarketing/GovernanceRecommendation?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link) 
 ---
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [Project Structure](#project-structure)
+
 - [Dataset Content](#dataset-content)
 - [Business Requirements](#business-requirements)
 - [Project Management](#project-management)
@@ -33,6 +34,7 @@ Analysing fairness, vulnerability and governance in automated financial product 
 - [Use of Generative AI](#use-of-generative-ai)
 - [Credits](#credits)
 - [Acknowledgements](#acknowledgements)
+- [Reflections](#Reflections) 
 
 ---
 
@@ -146,9 +148,7 @@ whether the model should be deployed.
 ## Project Management
 
 Work was tracked on a GitHub Project board with Backlog, In Progress and Done columns, with
-one card per project phase. Cards were moved as work progressed rather than assembled
-retrospectively.
-
+one card per project phase.
 
 ---
 
@@ -251,6 +251,7 @@ or close to it. Only H1 and H5 describe differences large enough to act on.
 | 8 | Evaluation | User testing, accessibility review, iteration |
 | 9 | Evaluation | Documentation and submission |
 
+[kanban board](https://github.com/users/Haroon-Code-2026/projects/3)
 ### Maintenance and updates
 
 Were this deployed, the following would be required rather than optional.
@@ -666,6 +667,50 @@ optimisation will not generate them.
 
 ## Dashboard Design
 
+Built in Tableau Public across six dashboards. Ten worksheets carry the exploratory
+analysis; the model results and ethics reasoning are presented as structured text, since
+that work was done in Python rather than in Tableau.
+
+### Serving two audiences
+
+Criterion 2.1 requires both technical metrics and simplified summaries in the same view.
+Every chart carries three layers arranged by position and weight:
+
+- a plain-English takeaway above it, in bold, stating the finding in one sentence
+- the chart itself, with all marks labelled
+- the supporting statistics below it, in smaller grey text — test statistic, p-value,
+  effect size, group sizes
+
+A reader who reads only the bold lines receives the complete argument. A reader who wants
+the evidence finds it directly beneath each chart without leaving the view.
+
+Sheet titles state findings rather than naming variables. "Clients aged 60 and over
+subscribed at nearly four times the rate of the working-age majority" rather than
+"Subscription rate by age band".
+
+### Accessibility
+
+- Okabe-Ito colourblind-safe palette throughout, matching the notebook figures
+- Every mark carries a value label, so no chart depends on colour to convey meaning
+- Fixed dashboard size of 1200 x 900, checked at 100% zoom
+- Manual sort applied to age band, education and month, since alphabetical ordering
+  produces a misleading sequence for all three
+- Group sizes displayed wherever a rate is shown
+- Navigation objects on every dashboard so a reader can move through the sequence without
+  using the tab strip
+
+### Decisions worth noting
+
+The `illiterate` education category is excluded from the education chart. It contains 18
+records, and a rate calculated from a cell that size would suggest a precision the data
+does not support. The exclusion is stated on the dashboard rather than applied silently.
+
+Heatmap cells containing fewer than 30 clients are left blank. A heatmap invites the eye to
+compare every cell equally, and an unsuppressed cell of five clients would read as a
+finding.
+
+Call duration is shown as a median rather than a mean, matching the figures reported in the
+hypothesis testing. Duration is heavily skewed, so the median is the more honest summary.
 
 
 ---
@@ -707,7 +752,10 @@ below.
 
 ## Unfixed Bugs
 
-
+I had several issues/bugs along the way including:
+- The subscibed field being read as measure as defaul
+- Text overflowing in dashboard write ups from 4-6
+- Two graphs looked odd so I re-ran after consulting Claude and tweaked columns/rows
 ---
 
 ## Development Roadmap
@@ -756,7 +804,7 @@ below.
 
 ## Use of Generative AI
 
-
+I used claude, not Claude Code, to help me with errors, write ups and validating results of my graphs.
 
 ---
 
@@ -773,9 +821,77 @@ telemarketing. *Decision Support Systems*, 62, 22–31.
 **Accessibility**
 Chart colours use the Okabe-Ito colourblind-safe palette.
 
----
+## Reflection
 
-## Acknowledgements
+### Choosing the dataset took longer than it should have
+
+The project began with a UK financial services dataset in mind, on the reasoning that a UK
+regulatory analysis needs UK data. That proved harder than expected. Almost all
+individual-level UK financial data with demographic variables — the Wealth and Assets
+Survey, the Family Resources Survey, Financial Lives microdata — sits behind a UK Data
+Service licence that prohibits redistribution, and the data has to be committed to a public
+repository for the dashboard to read it. What remains openly available in the UK is
+aggregate, firm-level or geographic, and none of it supports a fairness analysis about
+people.
+
+Several datasets were scoped and discarded before settling on the UCI Bank Marketing data
+with an explicit framing device. That cost time, but the constraint turned out to be worth
+understanding rather than working around: the reason open UK microdata is scarce is
+precisely the privacy protection this project is about.
+
+### The most useful decisions were made before the analysis started
+
+Two choices made early did more work than anything that came later.
+
+The first was framing two hypotheses as nulls — testing for the absence of disparity rather
+than for its presence. That removed the temptation to go looking for a finding, and it meant
+a "not supported" result was informative rather than a dead end.
+
+The second was adopting equal opportunity as the fairness standard and writing it down
+before computing any metrics. When the model then failed that standard by 0.326, the result
+was evidence rather than an argument. Had the standard been chosen afterwards, the honest
+options would have been to report a failure I had set myself up to find, or to pick the
+measure that flattered the model. Choosing first closed off the second option.
+
+### The result I did not expect
+
+The model was built without age, education, job or marital status. It has never seen a
+client's age. I expected the demographic disparity to shrink substantially as a result.
+
+It produced a demographic parity difference of 0.6435 — effectively unchanged. The
+disparity travels through prior contact history and campaign fields that encode who the bank
+approached before.
+
+In hindsight the visualisation work had already predicted this. The job-by-age heatmap
+showed age and occupation each carrying signal independently of the other, which is exactly
+the condition under which removing one field fails to remove the pattern. I did not connect
+the two at the time, and only recognised the relationship when the fairness metrics came
+back. The lesson is about sequencing: the exploratory finding was the more valuable of the
+two, and it was sitting in front of me two notebooks earlier.
+
+### Where I would spend more time
+
+**Threshold tuning.** The disparity was measured at a single global decision threshold.
+Group-specific thresholds might reduce it materially, at a stated cost to overall recall,
+and quantifying that trade-off would make the recommendation more useful than a refusal.
+This is documented as a condition for reconsideration rather than tested.
+
+**Intersectional analysis.** Fairness was measured across age and education separately. The
+group most likely to be affected — older clients with lower educational attainment — was
+never examined as a group. Single-attribute fairness analysis can pass while the
+intersection fails, and this project would not have detected that.
+
+### What I would do differently
+
+Write the data quality assessment before writing any hypotheses. The `default` field turned
+out to record three positive cases in 41,188 records, and the fact that it functioned as a
+disclosure indicator rather than a risk indicator was a finding in its own right. I
+discovered it during cleaning rather than during scoping, which meant reworking part of the
+feature set afterwards.
+
+Commit more granularly during the analysis phase. Commits during the ETL and modelling work
+covered more ground than they should have, which makes the development history harder to
+read than it needs to be.
 
 
 
