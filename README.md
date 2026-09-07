@@ -739,25 +739,6 @@ below.
 
 ---
 
-## Deployment
-
-
-**Running locally**
-
-```bash
-git clone https://github.com/Haroon-Code-2026/fair-marketing-analytics.git
-cd fair-marketing-analytics
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-Notebooks should be run in order, 01 through 04. Each writes to `Data_Set/` and the later
-notebooks depend on the earlier outputs.
-
----
-
 ## Main Data Analysis Libraries
 
 | Library | Use |
